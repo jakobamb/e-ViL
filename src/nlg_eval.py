@@ -20,6 +20,7 @@ from cococaption.pycocoevalcap.rouge.rouge import Rouge
 from cococaption.pycocoevalcap.spice.spice import Spice
 
 from datasets import load_metric
+from unidecode import unidecode
 import torch
 import statistics
 
@@ -40,9 +41,10 @@ def eval_nlp_scores(pred, gt, verbose=False):
     gts = {}
     res = {}
 
+    # jakob.ambsdorf@gmail.com 20/12/21: Convert to ASCII approximate to avoid crashing meteor
     for imgId in range(len(pred)):
-        gts[imgId] = gt[imgId]
-        res[imgId] = pred[imgId]
+        gts[imgId] = [unidecode(string) for string in gt[imgId]]
+        res[imgId] = [unidecode(string) for string in pred[imgId]]
 
     # Set up scorers
     if verbose:
