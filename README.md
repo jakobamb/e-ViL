@@ -30,6 +30,12 @@ In order to run NLG evaluation in this code you need to download the package fro
 
 ### Downloading the data
 
+A shell script can be used to download all data mentioned below using a single command. Before starting it, make sure you have provided your [kaggle credentials](https://github.com/Kaggle/kaggle-api#api-credentials). Then, download the data by running:
+
+`./download_data.sh`
+
+If any of the downloads fail, or if you want to only download part of the dataset, use the steps below to download the data manually.
+
 #### e-SNLI-VE
 
 1. Run this [script](https://github.com/ChenRocks/UNITER/blob/master/scripts/download_ve.sh) to download the Faster-RCNN features for Flickr30k and store them in `data/esnlive/img_db/flickr30k/`.
