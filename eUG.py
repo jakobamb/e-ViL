@@ -39,6 +39,7 @@ from eViL_data import eViLDataset, eViLTorchDataset, VQAXEvaluator, bbox_collate
 from eUG_generation import generate_text
 
 from src.expl_tokenization import VCRGpt2Tokenizer
+from src.data import DataParallel_eViL
 
 DataTuple = collections.namedtuple("DataTuple", "dataset loader evaluator")
 
@@ -209,6 +210,10 @@ class VQA:
             self.model.encoder.load(args.load_pretrained)
 
         self.model = self.model.to(self.device)
+        
+        if args.multiGPU:
+            # custom DataParallel across GPUs
+            self.model = DataParallel_eViL(self.model)
 
         # Loss and Optimizer
         if not args.test:
@@ -311,7 +316,10 @@ class VQA:
                     task_loss = (
                         self.loss_func(logit, target.to(self.device)) * loss_multiplier
                     )
-                    expl_loss = output[0]
+                    
+                    # take mean if multi gpu has produced multiple loss values
+                    expl_loss = output[0].mean()
+
                     # loss_weights = dwa(prev_losses, temp=args.temperature)
                     loss_weights = {"task": 1, "expl": 1}
                     # loss = loss_weights['task']*task_loss + loss_weights['expl']*expl_loss
@@ -784,7 +792,6 @@ class VQA:
         state_dict = torch.load("%s.pth" % path, map_location=torch.device("cpu"))
         self.model.load_state_dict(state_dict, strict=False)
         self.model = self.model.to(self.device)
-
 
 if __name__ == "__main__":
 
